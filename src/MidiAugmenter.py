@@ -44,16 +44,15 @@ class MidiAugmenter(object):
     return MidiAugmenter.augment_pitch(midi, pitch_shift)
 
   def augment_pitch(midi, pitch_shift):
-    print('ps', pitch_shift)
     new_midi = MidiFile()
     for track in midi.tracks:
       new_track = MidiTrack()
       new_midi.tracks.append(new_track)
       for msg in track:
-        if msg.is_meta:
-          new_track.append(msg.copy())
-        else:
+        if msg.type in ['note_on', 'note_off']:
           new_track.append(msg.copy(note=max(0, min(127, msg.note+pitch_shift)) ))
+        else:
+          new_track.append(msg.copy())
     return new_midi
 
   def randomly_augment_bpm(midi, bpm_shift_list):
@@ -61,7 +60,6 @@ class MidiAugmenter(object):
     return MidiAugmenter.augment_bpm(midi, bpm_shift)
 
   def augment_bpm(midi, bpm_shift):
-    print('bpm', bpm_shift)
     new_midi = copy.deepcopy(midi)
     for track in new_midi.tracks:
       for i, msg in enumerate(track):
@@ -75,7 +73,6 @@ class MidiAugmenter(object):
     return MidiAugmenter.augment_tempo(midi, tempo_shift)
 
   def augment_tempo(midi, tempo_shift):
-    print('tempo', tempo_shift)
     new_midi = copy.deepcopy(midi)
     for track in new_midi.tracks:
       for i, msg in enumerate(track):
